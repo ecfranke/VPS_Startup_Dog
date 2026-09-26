@@ -1,0 +1,23 @@
+[Unit]
+Description=Cloudflare DDNS + network watchdog
+Documentation=file:///opt/ddns-cf/README.md
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# root is required to renew DHCP / restart networking
+User=root
+WorkingDirectory=/opt/ddns-cf
+ExecStart=/usr/bin/python3 -u /opt/ddns-cf/ddns_cf.py run --env /opt/ddns-cf/.env
+Restart=always
+RestartSec=10
+# dhclient spawned by the watchdog must survive a restart of this service
+KillMode=process
+NoNewPrivileges=true
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
